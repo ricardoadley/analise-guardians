@@ -37,3 +37,9 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+#personalized by me ( remove some after )
+.pdf
+.Rmd
+.html
+.png
