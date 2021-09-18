@@ -1,6 +1,7 @@
 #importacao e construcao das tabelas
 
 #libraries
+#install.packages("tidyverse")
 library(tidyverse)
 library(dplyr)
 #data import
@@ -8,8 +9,7 @@ historico <- read_csv("https://github.com/elasComputacao/raio-x-dados/blob/main/
 
 #separacao para loac
 loac <- historico %>%
-  filter(stringr::str_detect(nome_disciplina,"LAB.DE ORG.E ARQUITETURA DE COMPUTADORES")
-         & periodo_ingresso >= 2014.1)
+  filter(stringr::str_detect(nome_disciplina,"LAB.DE ORG.E ARQUITETURA DE COMPUTADORES"))
 #pegar apartir de 1999 (?) 
 
 #separacao reprovados 
@@ -29,8 +29,8 @@ data_evadido <- loac %>%
 #codigo ainda em teste, juncao com disciplica oac
 grupo_azul <- historico %>%
   filter((stringr::str_detect(nome_disciplina,"LAB.DE ORG.E ARQUITETURA DE COMPUTADORES") |
-           stringr::str_detect(nome_disciplina,"ORGANIZACAO DE COMPUTADORES") | stringr::str_detect(nome_disciplina,"ORG.E ARQUITETURA DE COMPUTADORES I")) & periodo_ingresso >= 2014.1
-           )
+           stringr::str_detect(nome_disciplina,"ORGANIZACAO DE COMPUTADORES") | stringr::str_detect(nome_disciplina,"ORG.E ARQUITETURA DE COMPUTADORES I"))
+          )
 
 huum <- left_join(grupo_azul,data_evadido)
 

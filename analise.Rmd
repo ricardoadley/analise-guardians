@@ -1,0 +1,71 @@
+---
+title: "Analisando LOAC"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+  html_notebook: default
+---
+
+# Por que LOAC?
+
+Como aluno, todos nós ouvimos rumores sobre a disciplina e do impacto negativo dela no histórico do aluno. Através desse estudo queremos investigar o desempenho dos alunos dessa disciplina e pontuar possiveis causas e melhorias para o futuro da disciplina.
+
+O estudo foi feito utilizando a base de dados disponível no [Raio-X Elas](<https://github.com/elasComputacao/raio-x-dados/blob/main/data/dados-brutos/historico_alunos_raiox.csv?raw=true>).
+
+```{r, include = FALSE}
+library(tidyverse)
+library(dplyr)
+
+historico <- read_csv("https://github.com/elasComputacao/raio-x-dados/blob/main/data/dados-brutos/historico_alunos_raiox.csv?raw=true")
+
+#separacao para loac
+loac <- historico %>%
+  filter(stringr::str_detect(nome_disciplina,"LAB.DE ORG.E ARQUITETURA DE COMPUTADORES"))
+
+#separacao reprovados 
+data_rep <- loac %>% 
+  filter(situacao == "Reprovado por Falta" | situacao == "Trancado" | situacao == "Reprovado")
+
+#separacao aprovados 
+data_apr <- loac %>%
+  filter(situacao == "Aprovado")
+
+#separacao evadidos sem aprovar
+data_evadido <- loac %>%
+  filter((stringr::str_detect(forma_evasao,"CANCE") | stringr::str_detect(forma_evasao,"TRANSFERIDO PARA OUTRA IES")) & situacao != "Aprovado")
+
+```
+
+``` {r, include=FALSE, echo=TRUE}
+#contagem aprovados e reprovados
+aprovacoes<- loac %>%
+  filter(stringr::str_detect(situacao,"Apr"))%>%
+  summarize(aprovacoes = n_distinct(id))
+
+#considera reprovacao mesmo que passe depois
+reprovacoes <- loac %>% 
+  filter(situacao == "Reprovado por Falta" | situacao == "Trancado" | situacao == "Reprovado")%>%
+  summarize(reprovacoes = n_distinct(id))
+
+
+#considera apenas quem reprovou e nao graduou
+rep_e_nao_graduou <- loac %>% 
+  filter((situacao == "Reprovado por Falta" | situacao == "Trancado" | situacao == "Reprovado") & forma_evasao != "GRADUADO")%>%
+  summarize(reprovados = n_distinct(id))
+
+#construcao do data frame
+qtd_rep_apv <- data.frame (
+  aprovacoes,
+  reprovacoes
+)
+qtd_rep_apv$rep_sem_gradu <- rep_e_nao_graduou$reprovados
+qtd_rep_apv$total <- c(qtd_rep_apv$aprovacoes + qtd_rep_apv$rep_sem_gradu)
+qtd_rep_apv$pct_reprovados <- c(((100*qtd_rep_apv$rep_sem_gradu)/qtd_rep_apv$total))
+qtd_rep_apv$pct_aprovados <- c(((100*qtd_rep_apv$aprovacoes)/qtd_rep_apv$total))
+qtd_rep_apv$pct_reprovacao <- c(((100*qtd_rep_apv$reprovacoes)/qtd_rep_apv$total))
+```
+```{r, include=TRUE, echo=TRUE}
+qtd_rep_apv
+```
+A primeira análise que fizemos foi a quantidade de aprovações e reprovações, levamos em consideração também que um aluno poderia reprovar na disciplina e ser aprovado nele posteriormente.

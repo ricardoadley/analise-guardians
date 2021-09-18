@@ -3,7 +3,7 @@
 #plots para evadidos
 ggplot(plot_evadidos, aes(y = qtd, x = forma_evasao,fill = forma_evasao)) +
   geom_bar(stat = "identity")+
-  xlab("Forma de Evas?o") + 
+  xlab("Forma de Evasao") + 
   ylab("quantidade evadidos")+
   theme_light()
 

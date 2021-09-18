@@ -24,3 +24,4 @@ rep_apv$total <- c(rep_apv$aprovacoes + rep_apv$rep_sem_gradu)
 rep_apv$pct_reprovados <- c(((100*rep_apv$rep_sem_gradu)/rep_apv$total))
 rep_apv$pct_aprovados <- c(((100*rep_apv$aprovacoes)/rep_apv$total))
 rep_apv$pct_reprovacao <- c(((100*rep_apv$reprovacoes)/rep_apv$total))
+
