@@ -41,6 +41,7 @@ rep_apv$pct_reprovacao <- c(((100*rep_apv$reprovacoes)/rep_apv$total))
 data_rep <- loac %>% 
   filter(situacao == "Reprovado por Falta" | situacao == "Trancado" | situacao == "Reprovado")
 
+
 data_apr <- loac %>%
   filter(situacao == "Aprovado")
 
@@ -63,3 +64,10 @@ huum <- huum %>%
 
 # histograma de aprovados e um de reprovados (pelas notas)
 
+
+#remove repeticoes da reprovacao para no histograma contar apenas uma pessoa
+data_rep_unique <- data_rep[!duplicated(data_rep$id), ]
+
+#remove valores nan da media final dos reprovados
+data_rep_unique <- data_rep_unique %>%
+  mutate(media_final = tidyr::replace_na(media_final, 0))
