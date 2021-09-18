@@ -1,3 +1,5 @@
+#importacao e construcao das tabelas
+
 #libraries
 library(tidyverse)
 library(dplyr)
@@ -10,44 +12,21 @@ loac <- historico %>%
          & periodo_ingresso >= 2014.1)
 #pegar apartir de 1999 (?) 
 
-#contagem aprovados e reprovados
-aprovacoes<- loac %>%
-  filter(stringr::str_detect(situacao,"Apr"))%>%
-  summarize(aprovacoes = n_distinct(id))
-
-#considera reprovacao mesmo que passe depois
-reprovacoes <- loac %>% 
-  filter(situacao == "Reprovado por Falta" | situacao == "Trancado" | situacao == "Reprovado")%>%
-  summarize(reprovacoes = n_distinct(id))
-
-
-#considera apenas quem reprovou e nao graduou
-rep_e_nao_graduou <- loac %>% 
-  filter((situacao == "Reprovado por Falta" | situacao == "Trancado" | situacao == "Reprovado") & forma_evasao != "GRADUADO")%>%
-  summarize(reprovados = n_distinct(id))
-
-#construcao do data frame
-rep_apv <- data.frame (
-  aprovacoes,
-  reprovacoes
-)
-rep_apv$rep_sem_gradu <- rep_e_nao_graduou$reprovados
-rep_apv$total <- c(rep_apv$aprovacoes + rep_apv$rep_sem_gradu)
-rep_apv$pct_reprovados <- c(((100*rep_apv$rep_sem_gradu)/rep_apv$total))
-rep_apv$pct_aprovados <- c(((100*rep_apv$aprovacoes)/rep_apv$total))
-rep_apv$pct_reprovacao <- c(((100*rep_apv$reprovacoes)/rep_apv$total))
-
 #separacao reprovados 
 data_rep <- loac %>% 
   filter(situacao == "Reprovado por Falta" | situacao == "Trancado" | situacao == "Reprovado")
-
 
 data_apr <- loac %>%
   filter(situacao == "Aprovado")
 
 data_rep_e_nao_graduou <- loac %>% 
   filter((situacao == "Reprovado por Falta" | situacao == "Trancado" | situacao == "Reprovado") & forma_evasao != "GRADUADO")
+#separacao evadidos sem graduar
+data_evadido <- loac %>%
+  filter((stringr::str_detect(forma_evasao,"CANCE") | stringr::str_detect(forma_evasao,"TRANSFERIDO PARA OUTRA IES")) & situacao != "Aprovado")
 
+
+#codigo ainda em teste, juncao com disciplica oac
 grupo_azul <- historico %>%
   filter((stringr::str_detect(nome_disciplina,"LAB.DE ORG.E ARQUITETURA DE COMPUTADORES") |
            stringr::str_detect(nome_disciplina,"ORGANIZACAO DE COMPUTADORES") | stringr::str_detect(nome_disciplina,"ORG.E ARQUITETURA DE COMPUTADORES I")) & periodo_ingresso >= 2014.1
@@ -62,8 +41,7 @@ huum <- huum %>%
 
 #separar melhor os scrip e fazer novo pdf
 
-# histograma de aprovados e um de reprovados (pelas notas)
-
+# tabela usada para construcao do histograma e/ou outros plots para reprovados
 
 #remove repeticoes da reprovacao para no histograma contar apenas uma pessoa
 data_rep_unique <- data_rep[!duplicated(data_rep$id), ]

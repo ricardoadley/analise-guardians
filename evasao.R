@@ -1,8 +1,14 @@
-#separacao evadidos sem graduar
-data_evadido <- loac %>%
-  filter((stringr::str_detect(forma_evasao,"CANCE") | stringr::str_detect(forma_evasao,"TRANSFERIDO PARA OUTRA IES")) & situacao != "Aprovado")
+#construcao tabelas para plots de evadidos
+plot_evadidos <- data_evadido %>%
+  group_by(forma_evasao)%>%
+  summarise(qtd = n_distinct(id))%>%
+  arrange(desc(qtd))
 
-#who <- historico %>%
- #filter(id == "W364306")
+plot_evadidos_2 <- data_evadido %>%
+  group_by(forma_saida)%>%
+  summarise(qtd = n_distinct(id))%>%
+  arrange(desc(qtd))
 
-#somente_um_evadido <- data_evadido[!duplicated(data_evadido$id),]
+linha <- data.frame(forma_saida="Aprovado", qtd=aprovacoes$aprovacoes)
+
+plot_evadidos_2 <- rbind(plot_evadidos_2, linha)
