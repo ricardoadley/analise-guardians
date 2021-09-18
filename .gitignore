@@ -40,6 +40,5 @@ vignettes/*.pdf
 
 #personalized by me ( remove some after )
 .pdf
-.Rmd
 .html
 .png
