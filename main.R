@@ -12,7 +12,9 @@ historico <- read_csv("https://github.com/elasComputacao/raio-x-dados/blob/main/
 #separacao para loac
 loac <- historico %>%
   filter(stringr::str_detect(nome_disciplina,"LAB.DE ORG.E ARQUITETURA DE COMPUTADORES"))
-#pegar apartir de 1999 (?) 
+
+oac <- historico %>%
+  filter(stringr::str_detect(nome_disciplina,"ORGANIZACAO DE COMPUTADORES") | stringr::str_detect(nome_disciplina,"ORG.E ARQUITETURA DE COMPUTADORES I"))
 
 #separacao reprovados 
 data_rep <- loac %>% 
@@ -48,6 +50,8 @@ huum <- huum %>%
 #remove repeticoes da reprovacao para no histograma contar apenas uma pessoa
 data_rep_unique <- data_rep[!duplicated(data_rep$id), ]
 
+#oac_teste <- oac[!duplicated(oac$id),]
+#loac_teste <- loac[!duplicated(loac$id),]
 #remove valores nan da media final dos reprovados
 data_rep_unique <- data_rep_unique %>%
   mutate(media_final = tidyr::replace_na(media_final, 0))
