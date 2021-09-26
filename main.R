@@ -2,8 +2,10 @@
 
 #libraries
 #install.packages("tidyverse")
+#install.packages("formattable")
 library(tidyverse)
 library(dplyr)
+library(formattable)
 #data import
 historico <- read_csv("https://github.com/elasComputacao/raio-x-dados/blob/main/data/dados-brutos/historico_alunos_raiox.csv?raw=true")
 
