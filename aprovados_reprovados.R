@@ -5,13 +5,13 @@ aprovacoes <- loac %>%
 
 ### considera reprovacao mesmo que passe depois
 reprovacoes <- loac %>% 
-  filter(situacao == "Reprovado por Falta" | situacao == "Trancado" | situacao == "Reprovado")%>%
+  filter(situacao == "Reprovado por Falta" | situacao == "Reprovado")%>%
   summarize(reprovacoes = n_distinct(id))
 
 
 ### considera apenas quem reprovou e não graduou(não foi aprovado eventualmente)
 rep_e_nao_graduou <- loac %>% 
-  filter((situacao == "Reprovado por Falta" | situacao == "Trancado" | situacao == "Reprovado") & forma_evasao != "GRADUADO")%>%
+  filter((situacao == "Reprovado por Falta" | situacao == "Reprovado") & forma_evasao != "GRADUADO")%>%
   summarize(reprovados = n_distinct(id))
 
 # Construção do data frame para aprovações e reprovações na disciplina
@@ -30,13 +30,13 @@ aprovacoesOAC<- oac %>%
 
 ### considera reprovacao mesmo que passe depois
 reprovacoesOAC <- oac %>% 
-  filter(situacao == "Reprovado por Falta" | situacao == "Trancado" | situacao == "Reprovado")%>%
+  filter(situacao == "Reprovado por Falta" | situacao == "Reprovado")%>%
   summarize(reprovacoes = n_distinct(id))
 
 
 ### considera apenas quem reprovou e nao graduou
 rep_e_nao_graduou_OAC <- oac %>% 
-  filter((situacao == "Reprovado por Falta" | situacao == "Trancado" | situacao == "Reprovado") & forma_evasao != "GRADUADO")%>%
+  filter((situacao == "Reprovado por Falta" | situacao == "Reprovado") & forma_evasao != "GRADUADO")%>%
   summarize(reprovados = n_distinct(id))
 
 # Construção do data frame para aprovações e reprovações na disciplina
