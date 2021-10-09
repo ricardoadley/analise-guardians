@@ -40,12 +40,22 @@ data_rep_unique <- data_rep[!duplicated(data_rep$id), ]
 oac <- historico %>%
   filter(stringr::str_detect(nome_disciplina,"ORGANIZACAO DE COMPUTADORES") | stringr::str_detect(nome_disciplina,"ORG.E ARQUITETURA DE COMPUTADORES I"))
 
+#Captura os históricos de alunos de LOAC por situação
+data_rep_OAC <- oac %>% 
+  filter(situacao == "Reprovado por Falta" | situacao == "Reprovado")
+
+data_rep_OAC_unique <- data_rep_OAC[!duplicated(data_rep_OAC$id), ]
+
+data_apr_OAC <- oac %>%
+  filter(situacao == "Aprovado")
+
+data_evadido_OAC <- oac %>%
+  filter((stringr::str_detect(forma_evasao,"CANCE") | 
+          stringr::str_detect(forma_evasao,"TRANSFERIDO PARA OUTRA IES")) 
+          & situacao != "Aprovado")
+
 #Captura os históricos para OAC e LOAC
-oac_loac <- historico %>%  filter (
-  stringr::str_detect(nome_disciplina,"ORGANIZACAO DE COMPUTADORES") | 
-  stringr::str_detect(nome_disciplina,"ORG.E ARQUITETURA DE COMPUTADORES I") |
-  stringr::str_detect(nome_disciplina,"LAB.DE ORG.E ARQUITETURA DE COMPUTADORES")
-)
+oac_loac <- oac %>% left_join(loac, "id")
 
 evadidos_oac_loac <- left_join(oac_loac, data_evadido) %>%
   filter((stringr::str_detect(forma_evasao,"CANCE") | stringr::str_detect(forma_evasao,"TRANSFERIDO PARA OUTRA IES")) & situacao != "Aprovado")
