@@ -1,13 +1,13 @@
 #plotagens
 
 #plots para evadidos
-ggplot(plot_evadidos, aes(y = qtd, x = forma_evasao,fill = forma_evasao)) +
+ggplot(plot_evadidos, aes(y = qtd, x = forma_evasao, fill = forma_evasao)) +
   geom_bar(stat = "identity")+
   xlab("Forma de Evasao") + 
   ylab("quantidade evadidos")+
   theme_light()
 
-ggplot(plot_evadidos_2, aes(y = qtd, x = forma_saida,fill = forma_saida)) +
+ggplot(plot_evadidos_2, aes(y = qtd, x = forma_saida, fill = forma_saida)) +
   geom_bar(stat = "identity")+
   xlab("Forma de Saida") + 
   ylab("quantidade")+
