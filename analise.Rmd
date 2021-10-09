@@ -109,5 +109,70 @@ rep_apv_oac$pct_reprovacoes <- c(percent(((100*rep_apv_oac$reprovacoes)/(rep_apv
 ```{r,include=TRUE, echo=TRUE}
 rep_apv_oac
 ```
+Param uma visualização melhor vamos comparar os histogramas das medias das diciplinas tanto para aprovados quanto para reprovados.
+
+## Aprovados
+
+```{r, include=FALSE, echo=FALSE}
+data_apr_OAC <- oac %>%
+  filter(situacao == "Aprovado" & tipo_matricula != "Dispensa")
+data_apr <- loac %>%
+  filter(situacao == "Aprovado" & tipo_matricula != "Dispensa")
+
+```
+
+
+```{r,include=TRUE, echo=TRUE}
+
+ggplot(data = data_apr, aes(x = media_final)) +
+  geom_histogram(fill='blue') + 
+  labs(title="Histograma media aprovados LOAC",
+       x="Media", 
+       y="Quantidade")
+
+ggplot(data = data_apr_OAC, aes(x = media_final)) +
+  geom_histogram(fill='blue') + 
+  labs(title="Histograma media aprovados OAC", 
+       x="Media",
+       y="Quantidade")
+```
+
+```{r,include=FALSE, echo=FALSE}
+#Captura os históricos de alunos que reprovaram e evadiram sem ser aprovado em LOAC
+data_rep_e_nao_graduou <- loac %>% 
+  filter((situacao == "Reprovado por Falta" | situacao == "Reprovado") & forma_evasao != "GRADUADO")
+
+### Remove repeticoes da reprovacao para no histograma contar apenas uma pessoa
+data_rep_unique <- data_rep[!duplicated(data_rep$id), ]
+
+data_rep_unique <- data_rep_unique %>%
+  mutate(media_final = tidyr::replace_na(media_final, 0))
+
+#Captura os históricos de alunos de LOAC por situação
+data_rep_OAC <- oac %>% 
+  filter(situacao == "Reprovado por Falta" | situacao == "Reprovado")
+
+data_rep_OAC_unique <- data_rep_OAC[!duplicated(data_rep_OAC$id), ]
+
+data_rep_OAC_unique <- data_rep_OAC_unique %>%
+  mutate(media_final = tidyr::replace_na(media_final, 0))
+
+
+```
+## Reprovados
+```{r,include=TRUE,echo=TRUE}
+
+ggplot(data = data_rep_unique, aes(x = media_final)) +
+  geom_histogram(fill='blue') + 
+  labs(title="Histograma media reprovados LOAC", 
+       x="Media", 
+       y="Quantidade")
+
+ggplot(data = data_rep_OAC_unique, aes(x = media_final)) +
+  geom_histogram(fill='blue') + 
+  labs(title="Histograma media reprovados OAC", 
+       x="Media", 
+       y="Quantidade")
+```
 
 
