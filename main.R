@@ -19,18 +19,22 @@ loac <- historico %>%
 
 #Captura os históricos de alunos de LOAC por situação
 data_rep <- loac %>% 
-  filter(situacao == "Reprovado por Falta" | situacao == "Trancado" | situacao == "Reprovado")
+  filter(situacao == "Reprovado por Falta" | situacao == "Reprovado")
 
 data_apr <- loac %>%
   filter(situacao == "Aprovado")
 
 data_evadido <- loac %>%
-  filter((stringr::str_detect(forma_evasao,"CANCE") | stringr::str_detect(forma_evasao,"TRANSFERIDO PARA OUTRA IES")) & situacao != "Aprovado")
+  filter((stringr::str_detect(forma_evasao,"CANCE") | 
+          stringr::str_detect(forma_evasao,"TRANSFERIDO PARA OUTRA IES")) 
+          & situacao != "Aprovado")
 
 #Captura os históricos de alunos que reprovaram e evadiram sem ser aprovado em LOAC
 data_rep_e_nao_graduou <- loac %>% 
-  filter((situacao == "Reprovado por Falta" | situacao == "Trancado" | situacao == "Reprovado") & forma_evasao != "GRADUADO")
+  filter((situacao == "Reprovado por Falta" | situacao == "Reprovado") & forma_evasao != "GRADUADO")
 
+### Remove repeticoes da reprovacao para no histograma contar apenas uma pessoa
+data_rep_unique <- data_rep[!duplicated(data_rep$id), ]
 
 #Captura os históricos apenas para OAC
 oac <- historico %>%
@@ -45,12 +49,3 @@ oac_loac <- historico %>%  filter (
 
 evadidos_oac_loac <- left_join(oac_loac, data_evadido) %>%
   filter((stringr::str_detect(forma_evasao,"CANCE") | stringr::str_detect(forma_evasao,"TRANSFERIDO PARA OUTRA IES")) & situacao != "Aprovado")
-
-# tabela usada para construcao do histograma e/ou outros plots para reprovados
-
-#remove repeticoes da reprovacao para no histograma contar apenas uma pessoa
-data_rep_unique <- data_rep[!duplicated(data_rep$id), ]
-
-#remove valores nan da media final dos reprovados
-data_rep_unique <- data_rep_unique %>%
-  mutate( media_final = tidyr::replace_na(media_final, 0) )
