@@ -55,7 +55,10 @@ data_evadido_OAC <- oac %>%
           & situacao != "Aprovado")
 
 #Captura os históricos para OAC e LOAC
-oac_loac <- oac %>% left_join(loac, "id")
+oac_loac <- oac %>% inner_join(loac, by=c("id")) %>% 
+  select("id", "forma_evasao.x", "periodo_evasao.x", 
+         "nome_disciplina.x", "situacao.x", "media_final.x",
+         "nome_disciplina.y", "situacao.y", "media_final.y")
 
-evadidos_oac_loac <- left_join(oac_loac, data_evadido) %>%
+evadidos_oac_loac <- left_join(oac_loac_unique, data_evadido) %>%
   filter((stringr::str_detect(forma_evasao,"CANCE") | stringr::str_detect(forma_evasao,"TRANSFERIDO PARA OUTRA IES")) & situacao != "Aprovado")
