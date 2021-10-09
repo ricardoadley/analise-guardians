@@ -19,8 +19,8 @@ rep_apv_loac <- data.frame (
   aprovacoes,
   reprovacoes
 )
-rep_apv_loac$total <- c(rep_e_nao_graduou$reprovados + rep_apv$aprovacoes)
-rep_apv_loac$pct_reprovacoes <- c(percent(((100*rep_apv$reprovacoes)/(rep_apv$aprovacoes+rep_apv$reprovacoes))/100))
+rep_apv_loac$total <- c(rep_e_nao_graduou$reprovados + rep_apv_loac$aprovacoes)
+rep_apv_loac$pct_reprovacoes <- c(percent(((100*rep_apv_loac$reprovacoes)/(rep_apv_loac$aprovacoes+rep_apv_loac$reprovacoes))/100))
 
 
 # Contagem aprovados e reprovados em OAC
