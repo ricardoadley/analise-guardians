@@ -11,7 +11,7 @@ library(formattable)
 historico <- read_csv("https://github.com/elasComputacao/raio-x-dados/blob/main/data/dados-brutos/historico_alunos_raiox.csv?raw=true")
 
 #Intervalo que vamos utilizar: 2003 - 2020
-historico <- historico %>% filter(periodo_ingresso > 2003)
+historico <- historico %>% filter(periodo_matricula > 2003)
 
 #Captura os históricos apenas para LOAC
 loac <- historico %>%
@@ -38,7 +38,8 @@ data_rep_unique <- data_rep[!duplicated(data_rep$id), ]
 
 #Captura os históricos apenas para OAC
 oac <- historico %>%
-  filter(stringr::str_detect(nome_disciplina,"ORGANIZACAO DE COMPUTADORES") | stringr::str_detect(nome_disciplina,"ORG.E ARQUITETURA DE COMPUTADORES I"))
+  filter(stringr::str_detect(nome_disciplina,"ORGANIZACAO E ARQUIT. DE COMPUTADORES") | stringr::str_detect(nome_disciplina,"ORGANIZACAO DE COMPUTADORES") | stringr::str_detect(nome_disciplina,"ORG.E ARQUITETURA DE COMPUTADORES I"))
+
 
 #Captura os históricos de alunos de LOAC por situação
 data_rep_OAC <- oac %>% 
@@ -62,3 +63,13 @@ oac_loac <- oac %>% inner_join(loac, by=c("id")) %>%
 
 evadidos_oac_loac <- left_join(oac_loac_unique, data_evadido) %>%
   filter((stringr::str_detect(forma_evasao,"CANCE") | stringr::str_detect(forma_evasao,"TRANSFERIDO PARA OUTRA IES")) & situacao != "Aprovado")
+
+matriculas_loac <- loac %>%
+  group_by(periodo_matricula)%>%
+  summarise(qtd = n_distinct(id))%>%
+  arrange(desc(periodo_matricula))
+matriculas_oac <- oac %>%
+  group_by(periodo_matricula)%>%
+  summarise(qtd = n_distinct(id))%>%
+  arrange(desc(periodo_matricula))
+
