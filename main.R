@@ -63,13 +63,3 @@ oac_loac <- oac %>% inner_join(loac, by=c("id")) %>%
 
 evadidos_oac_loac <- left_join(oac_loac_unique, data_evadido) %>%
   filter((stringr::str_detect(forma_evasao,"CANCE") | stringr::str_detect(forma_evasao,"TRANSFERIDO PARA OUTRA IES")) & situacao != "Aprovado")
-
-matriculas_loac <- loac %>%
-  group_by(periodo_matricula)%>%
-  summarise(qtd = n_distinct(id))%>%
-  arrange(desc(periodo_matricula))
-matriculas_oac <- oac %>%
-  group_by(periodo_matricula)%>%
-  summarise(qtd = n_distinct(id))%>%
-  arrange(desc(periodo_matricula))
-
