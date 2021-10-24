@@ -134,6 +134,8 @@ ggplot(mediaLoac,aes(media_final, fill=grupo)) +
 
 ```
 
+
+## Reprovados
 ```{r,include=FALSE, echo=FALSE}
 #Captura os históricos de alunos que reprovaram e evadiram sem ser aprovado em LOAC
 data_rep_e_nao_graduou <- loac %>% 
@@ -156,7 +158,7 @@ data_rep_OAC_unique <- data_rep_OAC_unique %>%
 
 
 ```
-## Reprovados
+
 ```{r,include=TRUE,echo=TRUE}
 set.seed(1)
 mediaReprovadosLoac<-data.frame(data_rep_unique, grupo="MediaReprovadosLOAC")
@@ -166,4 +168,5 @@ ggplot(mediaReprovadosLoac,aes(media_final, fill=grupo)) +
   geom_histogram(data=mediaReprovadosOac,alpha = 0.5, position = 'identity',binwidth = 0.5)
 
 ```
+
 
