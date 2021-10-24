@@ -11,7 +11,7 @@ output:
 
 Como aluno, todos nós ouvimos rumores sobre a disciplina e do impacto negativo dela no histórico do aluno. Através desse estudo queremos investigar o desempenho dos alunos dessa disciplina e pontuar possíveis causas e melhorias para o futuro da disciplina.
 
-Pensando nisso, utilizamos os dados presentes no [Raio-X Elas](<https://github.com/elasComputacao/raio-x-dados/blob/main/data/dados-brutos/historico_alunos_raiox.csv?raw=true>) que possui dados dos alunos com período de ingresso de 1983.1 até 2016.1 extraídos do próprio controle acadêmico da universidade.
+Pensando nisso, utilizamos os dados presentes no [Raio-X Elas](<https://github.com/elasComputacao/raio-x-dados/blob/main/data/dados-brutos/historico_alunos_raiox.csv?raw=true>) que possui dados dos alunos com período de ingresso de 1983.1 até 2020.1 extraídos do próprio controle acadêmico da universidade. No entanto, para refletir com mais precisão a realidade atual utlizamos um recorte de dados a partir do periodo de 2003.1 onde foi iniciado a configuração atual das disciplinas OAC e LOAC.
 
 
 
@@ -77,8 +77,7 @@ rep_apv_loac$pct_reprovacoes <- c(percent(((100*rep_apv_loac$reprovacoes)/(rep_a
 ```{r, include=TRUE, echo=TRUE}
 rep_apv_loac
 ```
-Então esses 10,19% de reprovação na disciplina é alta? LOAC está realmente sendo uma barreira para todo mundo na graduação? Tentando responder essas dúvidas, fizemos essa análise para a irmã de conteúdo OAC e como podemos ver abaixo a porcentagem de reprovação sofreu uma mudança consideravel, tendo OAC 6,93% de reprovação uma diferença de 3,26%.
-
+Então esses 10,29% de reprovação na disciplina é alta? LOAC está realmente sendo uma barreira para todo mundo na graduação? Tentando responder essas dúvidas, fizemos essa análise para a irmã de conteúdo OAC e como podemos ver abaixo a porcentagem de reprovação sofreu uma mudança consideravel, tendo OAC 6,46% de reprovação, apenas um pouco mais que a metade da apresentada por LOAC.
 ```{r, include=FALSE, echo=FALSE}
 oac <- historico %>%
   filter(stringr::str_detect(nome_disciplina,"ORGANIZACAO DE COMPUTADORES") | 
@@ -118,25 +117,21 @@ Param uma visualização melhor vamos comparar os histogramas das medias das dic
 ```{r, include=FALSE, echo=FALSE}
 data_apr_OAC <- oac %>%
   filter(situacao == "Aprovado" & tipo_matricula != "Dispensa")
-data_apr <- loac %>%
+data_apr_LOAC <- loac %>%
   filter(situacao == "Aprovado" & tipo_matricula != "Dispensa")
 
 ```
 
 
 ```{r,include=TRUE, echo=TRUE}
+set.seed(1)
+mediaLoac<-data.frame(data_apr_LOAC, grupo="MediaAprovadosLOAC")
+mediaOac<-data.frame(data_apr_OAC, grupo="MediaAprovadosOAC")
+ggplot(mediaLoac,aes(media_final, fill=grupo)) + 
+  geom_histogram(alpha = 0.5, position = 'identity',binwidth = 0.5)+
+  geom_histogram(data=mediaOac,alpha = 0.5, position = 'identity',binwidth = 0.5)
 
-ggplot(data = data_apr, aes(x = media_final)) +
-  geom_histogram(fill='blue') + 
-  labs(title="Histograma media aprovados LOAC",
-       x="Media", 
-       y="Quantidade")
 
-ggplot(data = data_apr_OAC, aes(x = media_final)) +
-  geom_histogram(fill='blue') + 
-  labs(title="Histograma media aprovados OAC", 
-       x="Media",
-       y="Quantidade")
 ```
 
 ```{r,include=FALSE, echo=FALSE}
@@ -163,23 +158,12 @@ data_rep_OAC_unique <- data_rep_OAC_unique %>%
 ```
 ## Reprovados
 ```{r,include=TRUE,echo=TRUE}
+set.seed(1)
+mediaReprovadosLoac<-data.frame(data_rep_unique, grupo="MediaReprovadosLOAC")
+mediaReprovadosOac<-data.frame(data_rep_OAC_unique, grupo="MediaReprovadosOAC")
+ggplot(mediaReprovadosLoac,aes(media_final, fill=grupo)) + 
+  geom_histogram(alpha = 0.5, position = 'identity',binwidth = 0.5)+
+  geom_histogram(data=mediaReprovadosOac,alpha = 0.5, position = 'identity',binwidth = 0.5)
 
-ggplot(data = data_rep_unique, aes(x = media_final)) +
-  geom_histogram(fill='blue') + 
-  labs(title="Histograma media reprovados LOAC", 
-       x="Media", 
-       y="Quantidade")
-
-ggplot(data = data_rep_OAC_unique, aes(x = media_final)) +
-  geom_histogram(fill='blue') + 
-  labs(title="Histograma media reprovados OAC", 
-       x="Media", 
-       y="Quantidade")
 ```
-```{r, include=TRUE, echo=TRUE}
-ggplot(data = data_apr_OAC, aes(x = media_final)) +
-  geom_histogram(fill='blue')
 
-ggplot(data = data_rep_OAC_unique, aes(x = media_final)) +
-  geom_histogram(fill='blue')
-```
