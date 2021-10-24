@@ -36,10 +36,10 @@ data_rep_e_nao_graduou <- loac %>%
 ### Remove repeticoes da reprovacao para no histograma contar apenas uma pessoa
 data_rep_unique <- data_rep[!duplicated(data_rep$id), ]
 
+
 #Captura os históricos apenas para OAC
 oac <- historico %>%
   filter(stringr::str_detect(nome_disciplina,"ORGANIZACAO E ARQUIT. DE COMPUTADORES") | stringr::str_detect(nome_disciplina,"ORGANIZACAO DE COMPUTADORES") | stringr::str_detect(nome_disciplina,"ORG.E ARQUITETURA DE COMPUTADORES I"))
-
 
 #Captura os históricos de alunos de LOAC por situação
 data_rep_OAC <- oac %>% 
@@ -55,11 +55,14 @@ data_evadido_OAC <- oac %>%
           stringr::str_detect(forma_evasao,"TRANSFERIDO PARA OUTRA IES")) 
           & situacao != "Aprovado")
 
+
 #Captura os históricos para OAC e LOAC
 oac_loac <- oac %>% inner_join(loac, by=c("id")) %>% 
-  select("id", "forma_evasao.x", "periodo_evasao.x", 
+  select("id", "forma_evasao.x", "periodo_evasao.x", "apv_media_geral.x", "evadiu_periodo.x", 
          "nome_disciplina.x", "situacao.x", "media_final.x",
          "nome_disciplina.y", "situacao.y", "media_final.y")
+
+oac_loac_unique <- oac_loac[!duplicated(oac_loac$id), ]
 
 evadidos_oac_loac <- left_join(oac_loac_unique, data_evadido) %>%
   filter((stringr::str_detect(forma_evasao,"CANCE") | stringr::str_detect(forma_evasao,"TRANSFERIDO PARA OUTRA IES")) & situacao != "Aprovado")
