@@ -30,7 +30,7 @@ loac <- historico %>%
 
 #separacao reprovados 
 data_rep <- loac %>% 
-  filter(situacao == "Reprovado por Falta" | situacao == "Reprovado")
+  filter(situacao == "Reprovado por Falta" | situacao == "Reprovado" | situacao == "Trancado")
 
 #separacao aprovados 
 data_apr <- loac %>%
@@ -55,13 +55,13 @@ aprovacoes <- loac %>%
 
 ### considera reprovacao mesmo que passe depois
 reprovacoes <- loac %>% 
-  filter(situacao == "Reprovado por Falta" | situacao == "Reprovado")%>%
+  filter(situacao == "Reprovado por Falta" | situacao == "Reprovado" | situacao == "Trancado")%>%
   summarize(reprovacoes = n_distinct(id))
 
 
 #considera apenas quem reprovou e nao graduou
 rep_e_nao_graduou <- loac %>% 
-  filter((situacao == "Reprovado por Falta" | situacao == "Reprovado") & forma_evasao != "GRADUADO")%>%
+  filter((situacao == "Reprovado por Falta" | situacao == "Reprovado" | situacao == "Trancado") & forma_evasao != "GRADUADO")%>%
   summarize(reprovados = n_distinct(id))
 
 # Construção do data frame para aprovações e reprovações na disciplina
@@ -69,15 +69,15 @@ rep_apv_loac <- data.frame (
   aprovacoes,
   reprovacoes
 )
-rep_apv_loac$total <- c(rep_e_nao_graduou$reprovados + rep_apv_loac$aprovacoes)
-rep_apv_loac$pct_reprovacoes <- c(percent(((100*rep_apv_loac$reprovacoes)/(rep_apv_loac$aprovacoes+rep_apv_loac$reprovacoes))/100))
+rep_apv_loac$total <- c(rep_apv_loac$reprovacoes + rep_apv_loac$aprovacoes)
+rep_apv_loac$pct_reprovacoes<-c(percent(((100*rep_apv_loac$reprovacoes)/(rep_apv_loac$aprovacoes+rep_apv_loac$reprovacoes))/100))
 
 
 ```
 ```{r, include=TRUE, echo=TRUE}
 rep_apv_loac
 ```
-Então esses 10,29% de reprovação na disciplina é alta? LOAC está realmente sendo uma barreira para todo mundo na graduação? Tentando responder essas dúvidas, fizemos essa análise para a irmã de conteúdo OAC e como podemos ver abaixo a porcentagem de reprovação sofreu uma mudança consideravel, tendo OAC 6,46% de reprovação, apenas um pouco mais que a metade da apresentada por LOAC.
+Então esses 11,66% de reprovação na disciplina é alta? LOAC está realmente sendo uma barreira para todo mundo na graduação? Tentando responder essas dúvidas, fizemos essa análise para a irmã de conteúdo OAC e como podemos ver abaixo a porcentagem de reprovação sofreu uma mudança consideravel, tendo OAC 7,63% de reprovação, apresentando uma diferença de 4,03% a menos que LOAC.
 ```{r, include=FALSE, echo=FALSE}
 oac <- historico %>%
   filter(stringr::str_detect(nome_disciplina,"ORGANIZACAO DE COMPUTADORES") | 
@@ -90,21 +90,16 @@ aprovacoesOAC<- oac %>%
 
 #considera reprovacao mesmo que passe depois
 reprovacoesOAC <- oac %>% 
-  filter(situacao == "Reprovado por Falta" | situacao == "Reprovado")%>%
+  filter(situacao == "Reprovado por Falta" | situacao == "Reprovado" | situacao == "Trancado")%>%
   summarize(reprovacoes = n_distinct(id))
 
-
-#considera apenas quem reprovou e nao graduou
-rep_e_nao_graduou_OAC <- oac %>% 
-  filter((situacao == "Reprovado por Falta" | situacao == "Reprovado") & forma_evasao != "GRADUADO")%>%
-  summarize(reprovados = n_distinct(id))
 
 # Construção do data frame para aprovações e reprovações na disciplina
 rep_apv_oac <- data.frame (
   aprovacoesOAC,
   reprovacoesOAC
 )
-rep_apv_oac$total <- c(rep_e_nao_graduou_OAC$reprovados + rep_apv_oac$aprovacoes)
+rep_apv_oac$total <- c(rep_apv_oac$aprovacoes + rep_apv_oac$reprovacoes)
 rep_apv_oac$pct_reprovacoes <- c(percent(((100*rep_apv_oac$reprovacoes)/(rep_apv_oac$aprovacoes+rep_apv_oac$reprovacoes))/100))
 ```
 ```{r,include=TRUE, echo=TRUE}
@@ -112,6 +107,39 @@ rep_apv_oac
 ```
 Param uma visualização melhor vamos comparar os histogramas das medias das diciplinas tanto para aprovados quanto para reprovados.
 
+## Reprovados
+```{r,include=FALSE, echo=FALSE}
+#Captura os históricos de alunos que reprovaram e evadiram sem ser aprovado em LOAC
+data_rep_e_nao_graduou <- loac %>% 
+  filter((situacao == "Reprovado por Falta" | situacao == "Reprovado" | situacao == "Trancado") & forma_evasao != "GRADUADO")
+
+### Remove repeticoes da reprovacao para no histograma contar apenas uma pessoa
+data_rep_unique <- data_rep[!duplicated(data_rep$id,fromLast = TRUE), ]
+
+data_rep_unique <- data_rep_unique %>%
+  mutate(media_final = tidyr::replace_na(media_final, 0))
+
+#Captura os históricos de alunos de LOAC por situação
+data_rep_OAC <- oac %>% 
+  filter(situacao == "Reprovado por Falta" | situacao == "Reprovado" | situacao == "Trancado")
+
+data_rep_OAC_unique <- data_rep_OAC[!duplicated(data_rep_OAC$id,fromLast = TRUE), ]
+
+data_rep_OAC_unique <- data_rep_OAC_unique %>%
+  mutate(media_final = tidyr::replace_na(media_final, 0))
+
+
+```
+
+```{r,include=TRUE,echo=TRUE}
+set.seed(1)
+mediaReprovadosLoac<-data.frame(data_rep_unique, grupo="MediaReprovadosLOAC")
+mediaReprovadosOac<-data.frame(data_rep_OAC_unique, grupo="MediaReprovadosOAC")
+ggplot(mediaReprovadosLoac,aes(media_final, fill=grupo)) + 
+  geom_histogram(alpha = 0.5, position = 'identity',binwidth = 0.5)+
+  geom_histogram(data=mediaReprovadosOac,alpha = 0.5, position = 'identity',binwidth = 0.5)
+
+```
 ## Aprovados
 
 ```{r, include=FALSE, echo=FALSE}
@@ -133,37 +161,11 @@ ggplot(mediaLoac,aes(media_final, fill=grupo)) +
 
 
 ```
-
-```{r,include=FALSE, echo=FALSE}
-#Captura os históricos de alunos que reprovaram e evadiram sem ser aprovado em LOAC
-data_rep_e_nao_graduou <- loac %>% 
-  filter((situacao == "Reprovado por Falta" | situacao == "Reprovado") & forma_evasao != "GRADUADO")
-
-### Remove repeticoes da reprovacao para no histograma contar apenas uma pessoa
-data_rep_unique <- data_rep[!duplicated(data_rep$id), ]
-
-data_rep_unique <- data_rep_unique %>%
-  mutate(media_final = tidyr::replace_na(media_final, 0))
-
-#Captura os históricos de alunos de LOAC por situação
-data_rep_OAC <- oac %>% 
-  filter(situacao == "Reprovado por Falta" | situacao == "Reprovado")
-
-data_rep_OAC_unique <- data_rep_OAC[!duplicated(data_rep_OAC$id), ]
-
-data_rep_OAC_unique <- data_rep_OAC_unique %>%
-  mutate(media_final = tidyr::replace_na(media_final, 0))
+No histograma acima, onde vemos o agrupamento das medias dos aprovados, podemos notar que os aprovados em LOAC constumam apresentar um desempenho mais concentrado em notas superiores a 8 do que as apresentadas em OAC. Comparando com o número de reprovações, e levando em consideração que reprovações por falta e trancamentos, na nossa analise, tem o valor da media final como zero totalizando -aqui quantidade - mais numero de evasões durante o curso da disciplina de - aqui quantidade -, pode indicar que o ambiente da disciplina não é agradavel para o aluno, o que resulta em um valor expressivo de desistencias durante o perido mesmo que o aluno possa chegar a atingir uma nota satisfatoria se continuar o curso da disciplina.
 
 
-```
-## Reprovados
-```{r,include=TRUE,echo=TRUE}
-set.seed(1)
-mediaReprovadosLoac<-data.frame(data_rep_unique, grupo="MediaReprovadosLOAC")
-mediaReprovadosOac<-data.frame(data_rep_OAC_unique, grupo="MediaReprovadosOAC")
-ggplot(mediaReprovadosLoac,aes(media_final, fill=grupo)) + 
-  geom_histogram(alpha = 0.5, position = 'identity',binwidth = 0.5)+
-  geom_histogram(data=mediaReprovadosOac,alpha = 0.5, position = 'identity',binwidth = 0.5)
 
-```
+
+
+
 

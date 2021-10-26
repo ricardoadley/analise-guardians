@@ -19,7 +19,7 @@ loac <- historico %>%
 
 #Captura os históricos de alunos de LOAC por situação
 data_rep <- loac %>% 
-  filter(situacao == "Reprovado por Falta" | situacao == "Reprovado")
+  filter(situacao == "Reprovado por Falta" | situacao == "Reprovado" | situacao == "Trancado")
 
 data_apr <- loac %>%
   filter(situacao == "Aprovado")
@@ -43,7 +43,7 @@ oac <- historico %>%
 
 #Captura os históricos de alunos de LOAC por situação
 data_rep_OAC <- oac %>% 
-  filter(situacao == "Reprovado por Falta" | situacao == "Reprovado")
+  filter(situacao == "Reprovado por Falta" | situacao == "Reprovado" | situacao == "Trancado" )
 
 data_rep_OAC_unique <- data_rep_OAC[!duplicated(data_rep_OAC$id), ]
 
