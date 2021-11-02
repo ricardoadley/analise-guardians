@@ -11,9 +11,7 @@ output:
 
 Como aluno, todos nós ouvimos rumores sobre a disciplina e do impacto negativo dela no histórico do aluno. Através desse estudo queremos investigar o desempenho dos alunos dessa disciplina e pontuar possíveis causas e melhorias para o futuro da disciplina.
 
-Pensando nisso, utilizamos os dados presentes no [Raio-X Elas](<https://github.com/elasComputacao/raio-x-dados/blob/main/data/dados-brutos/historico_alunos_raiox.csv?raw=true>) que possui dados dos alunos com período de ingresso de 1983.1 até 2020.1 extraídos do próprio controle acadêmico da universidade. No entanto, para refletir com mais precisão a realidade atual utlizamos um recorte de dados a partir do periodo de 2003.1 onde foi iniciado a configuração atual das disciplinas OAC e LOAC.
-
-
+Pensando nisso, utilizamos os dados presentes no [Raio-X Elas](<https://github.com/elasComputacao/raio-x-dados/blob/main/data/dados-brutos/historico_alunos_raiox.csv?raw=true>) que possui dados dos alunos com período de ingresso de 1983.1 até 2020.1 extraídos do próprio controle acadêmico da universidade. No entanto, para refletir com mais precisão a realidade atual utilizamos um recorte de dados a partir do período de 2003.1 onde foi iniciado a configuração atual das disciplinas OAC e LOAC.
 
 ```{r, include = FALSE}
 library(tidyverse)
@@ -43,9 +41,10 @@ data_evadido <- loac %>%
 ```
 # A maioria reprova em LOAC?
 
-Um dos maiores medos do graduando é perder cadeira, e sem dúvidas LOAC já se torna o terror do curso desde a semana do fera. Com a fama mais em baixa do que a qualidade da água do laguinho não é difícil encontrar pessoas no curso com reclamações, mas a disciplina é tão difícil assim?
+Um dos maiores medos do graduando é perder cadeira, e sem dúvidas LOAC já se torna o terror do curso desde a semana do fera. Com uma das famas mais baixas entre as disciplinas, não é difícil encontrar pessoas no curso com reclamações, mas a disciplina é tão difícil assim?
 
 A primeira análise que fizemos foi a quantidade de aprovações e reprovações, levamos em consideração também que um aluno poderia reprovar na disciplina e ser aprovado nele posteriormente.
+
 
 ``` {r, include=FALSE, echo=TRUE}
 # Contagem aprovados e reprovados em LOAC
@@ -77,7 +76,7 @@ rep_apv_loac$pct_reprovacoes<-c(percent(((100*rep_apv_loac$reprovacoes)/(rep_apv
 ```{r, include=TRUE, echo=TRUE}
 rep_apv_loac
 ```
-Então esses 11,66% de reprovação na disciplina é alta? LOAC está realmente sendo uma barreira para todo mundo na graduação? Tentando responder essas dúvidas, fizemos essa análise para a irmã de conteúdo OAC e como podemos ver abaixo a porcentagem de reprovação sofreu uma mudança consideravel, tendo OAC 7,63% de reprovação, apresentando uma diferença de 4,03% a menos que LOAC.
+Então esses 11,66% de reprovação na disciplina é alta? LOAC está realmente sendo uma barreira para todo mundo na graduação? Tentando responder essas dúvidas, fizemos essa análise para a irmã de conteúdo OAC e como podemos ver abaixo a porcentagem de reprovação sofreu uma mudança considerável, tendo OAC 7,63% de reprovação, apresentando uma diferença de 4,03% a menos que LOAC.
 ```{r, include=FALSE, echo=FALSE}
 oac <- historico %>%
   filter(stringr::str_detect(nome_disciplina,"ORGANIZACAO DE COMPUTADORES") | 
@@ -105,9 +104,48 @@ rep_apv_oac$pct_reprovacoes <- c(percent(((100*rep_apv_oac$reprovacoes)/(rep_apv
 ```{r,include=TRUE, echo=TRUE}
 rep_apv_oac
 ```
-Param uma visualização melhor vamos comparar os histogramas das medias das diciplinas tanto para aprovados quanto para reprovados.
+Param uma visualização melhor vamos comparar os histogramas das medias das disciplinas tanto para aprovados quanto para reprovados.
+
+## Aprovados
+
+```{r, include=FALSE, echo=FALSE}
+data_apr_OAC <- oac %>%
+  filter(situacao == "Aprovado" & tipo_matricula != "Dispensa")
+data_apr_LOAC <- loac %>%
+  filter(situacao == "Aprovado" & tipo_matricula != "Dispensa")
+
+```
+
+
+```{r,include=TRUE, echo=TRUE}
+set.seed(1)
+mediaLoac<-data.frame(data_apr_LOAC, grupo="MediaAprovadosLOAC")
+mediaOac<-data.frame(data_apr_OAC, grupo="MediaAprovadosOAC")
+ggplot(mediaLoac,aes(media_final, fill=grupo)) + 
+  geom_histogram(alpha = 0.5, position = 'identity',binwidth = 0.5)+
+  geom_histogram(data=mediaOac,alpha = 0.5, position = 'identity',binwidth = 0.5)
+
+
+```
+No histograma acima, onde vemos o agrupamento das medias dos aprovados, podemos notar que os aprovados em LOAC costumam apresentar um desempenho mais concentrado em notas superiores a 8 do que as apresentadas em OAC. Podemos ver pelo boxplot abaixo que as medias das disciplinas diferem pouco entre si.
+```{r,include=FALSE,echo=FALSE}
+#Captura os históricos para OAC e LOAC
+oac_loac <- oac %>% inner_join(loac, by=c("id")) %>% 
+  select("id", "forma_evasao.x", "periodo_evasao.x", "apv_media_geral.x", "evadiu_periodo.x", 
+         "nome_disciplina.x", "situacao.x", "media_final.x",
+         "nome_disciplina.y", "situacao.y", "media_final.y")
+
+oac_loac_unique <- oac_loac[!duplicated(oac_loac$id), ]
+notas <- list(oac_loac_unique$media_final.x, oac_loac_unique$media_final.y)
+names(notas) <- list("OAC", "LOAC")
+
+```
+```{r,include=TRUE, echo=TRUE}
+boxplot(notas, col="#69b3a2", ylab="notas")
+```
 
 ## Reprovados
+
 ```{r,include=FALSE, echo=FALSE}
 #Captura os históricos de alunos que reprovaram e evadiram sem ser aprovado em LOAC
 data_rep_e_nao_graduou <- loac %>% 
@@ -140,29 +178,43 @@ ggplot(mediaReprovadosLoac,aes(media_final, fill=grupo)) +
   geom_histogram(data=mediaReprovadosOac,alpha = 0.5, position = 'identity',binwidth = 0.5)
 
 ```
-## Aprovados
 
-```{r, include=FALSE, echo=FALSE}
-data_apr_OAC <- oac %>%
-  filter(situacao == "Aprovado" & tipo_matricula != "Dispensa")
-data_apr_LOAC <- loac %>%
-  filter(situacao == "Aprovado" & tipo_matricula != "Dispensa")
+Observando a dispersão dos reprovados, podemos notar que em LOAC acontece uma maior concentração de pessoas abaixo do mínimo necessário para tentar uma prova final e uma aprovação com a nota mínima (5), isso pode ser reflexo do método de avaliação da disciplina que pode levar alguns alunos a não desenvolver notas satisfatórias ou até mesmo a não tentar continuar com as avaliações da disciplina, como podemos notar na maior concentração de alunos com media 0 em LOAC. Levando em consideração que reprovações por falta e trancamentos, na nossa analise, tem o valor da média final como zero totalizando -aqui quantidade - mais número de evasões durante o curso da disciplina de - aqui quantidade -, pode indicar que o ambiente da disciplina não é agradável para o aluno, o que resulta em um valor expressivo de desistências durante o período mesmo que o aluno possa chegar a atingir uma nota satisfatória se continuar o curso da disciplina.
+
+# Uma olhada nos evadidos
+
+Observando os alunos que evadiram do curso, sem ter conseguido sua aprovação em LOAC, podemos notar uma diferença significativa se comparado com a mesma ocorrência em OAC. De fato, não podemos associar diretamente a evasão a não aprovação em LOAC mas podemos supor que a reprovação na disciplina possa ter se tornado um catalizador para a decisão.
+
+```{r,include=FALSE, echo=FALSE}
+data_evadido <- loac %>%
+  filter((stringr::str_detect(forma_evasao,"CANCE") | 
+          stringr::str_detect(forma_evasao,"TRANSFERIDO PARA OUTRA IES")) 
+          & situacao != "Aprovado")
+
+# Construção tabelas para plots de evadidos LOAC
+plot_evadidos_loac <- data_evadido %>%
+  group_by(forma_evasao)%>%
+  summarise(qtd = n_distinct(id))%>%
+  arrange(desc(qtd))
 
 ```
-
 
 ```{r,include=TRUE, echo=TRUE}
-set.seed(1)
-mediaLoac<-data.frame(data_apr_LOAC, grupo="MediaAprovadosLOAC")
-mediaOac<-data.frame(data_apr_OAC, grupo="MediaAprovadosOAC")
-ggplot(mediaLoac,aes(media_final, fill=grupo)) + 
-  geom_histogram(alpha = 0.5, position = 'identity',binwidth = 0.5)+
-  geom_histogram(data=mediaOac,alpha = 0.5, position = 'identity',binwidth = 0.5)
-
-
+#plots para evadidos loac
+ggplot(plot_evadidos_loac, aes(y = qtd, x = forma_evasao, fill = forma_evasao)) +
+  geom_bar(stat = "identity")+
+  xlab("Forma de Evasao") + 
+  ylab("quantidade evadidos")+
+  theme_light()
 ```
-No histograma acima, onde vemos o agrupamento das medias dos aprovados, podemos notar que os aprovados em LOAC constumam apresentar um desempenho mais concentrado em notas superiores a 8 do que as apresentadas em OAC. Comparando com o número de reprovações, e levando em consideração que reprovações por falta e trancamentos, na nossa analise, tem o valor da media final como zero totalizando -aqui quantidade - mais numero de evasões durante o curso da disciplina de - aqui quantidade -, pode indicar que o ambiente da disciplina não é agradavel para o aluno, o que resulta em um valor expressivo de desistencias durante o perido mesmo que o aluno possa chegar a atingir uma nota satisfatoria se continuar o curso da disciplina.
+Podemos notar que entre os evadidos que não obtiveram uma aprovação em LOAC as principais causas foram a reprovação na mesma disciplina por 3 vezes, o reingresso no curso ( feito normalmente para evitar a evasão por 3 reprovações) e o abandono do curso.
+ 
+# LOAC é tão difícil assim?
 
+Retornando para a questão que deu origem a essa análise, podemos supor que LOAC (no quesito notas e aprovações) não se difere significantemente de OAC, sua irmã de conteúdo. No entanto, podemos notar que LOAC tem uma singela diferença quando olhamos para os reprovados e suas notas. Esse desempenho inferior pode ocorrer por causa do método avaliativo da disciplina (aqui impossível de analisar) que torna o período da disciplina desgastante para os alunos, levando muitos a trancamentos e desempenhos pífios, como podemos ver na acentuação de medias 0 entre os reprovados. 
+
+Por ser uma disciplina pratica, a mesma já apresenta uma forma de avaliação diferenciada das disciplinas teóricas. Pelo desempenho dos aprovados na disciplina podemos supor que concluir a disciplina com um bom resultado é possível, mas não podemos supor o quão desgastante para o aluno pode ser esse período. Por fim, uma observação que podemos levantar é a necessidade de se revisar a forma avaliativa da disciplina, afim de melhorar os índices combatendo o alto número de alunos com media igual a 0 e os alunos que não chegam a atingir a nota mínima para tentar uma prova final.
+ 
 
 
 

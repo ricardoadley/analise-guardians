@@ -45,5 +45,5 @@ ggplot(data = data_rep_OAC_unique, aes(x = media_final)) +
 
 #boxplot das notas de OAC e LOAC
 notas <- list(oac_loac_unique$media_final.x, oac_loac_unique$media_final.y)
-names(notas) <- list("Média OAC", "Média LOAC")
+names(notas) <- list("OAC", "LOAC")
 boxplot(notas, col="#69b3a2", ylab="notas")
