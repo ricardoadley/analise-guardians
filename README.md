@@ -16,7 +16,7 @@ Grupo da Célula de Análise de Dados Guardians dedicado a estudar a estrutura d
 
 ### Notion 📔
 
-A principal forma que usamos para organizar informação e planejar até o momento é por uma [página no Notion](https://emys-alb.notion.site/Guardians-290cad665f3d4f65afa713f268367ae7).
+A principal forma que usamos para organizar informação é por uma página no Notion, acessível locamente nesse [link](./notion/Analisando_LOAC.md).
 
 ### Como contribuir❓
 
